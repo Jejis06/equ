@@ -1,19 +1,32 @@
 #include <iostream>
 #include <math.h>
+
+typedef long long ull;
+
 using namespace std;
 
-//recursive parto fo equasion
+//global pointer for convinience
+ull** mem = nullptr;
+
+//recursive part of equasion
 template<typename INT> INT eq(INT x,INT k, INT n){
+	
 
 	if (k == 0) return 0;
 
 	INT sum = 0;
 	
+
+	if(mem[n][k] != -1) {
+		return mem[n][k];
+	}
+
 	if (k == 1){
 		sum = pow(n,2) - n;
 		for(INT i=1;i<n;i++){
 		       	sum -= i;
 		}
+		mem[n][k] = sum;
 		return sum;
 	}	
 
@@ -21,6 +34,7 @@ template<typename INT> INT eq(INT x,INT k, INT n){
 		sum += (n-i) * eq<INT>(x,k-1,n-i) * pow(x,n - (n - (i-1)));
 	}
 
+	mem[n][k] = sum;
 	return sum;
 
 }
@@ -29,6 +43,7 @@ template<typename INT> INT eq(INT x,INT k, INT n){
 template<typename INT> INT compute(INT x,INT n){
 	
 	INT sum = 0;
+
 	for(int i=1;i<=(n-1);i++)
 		sum += eq<INT>(x,i,n);
 
@@ -41,6 +56,8 @@ template<typename INT> void display_and_compute(INT x, INT n){
 	cout << "x";
 	if(n-1) cout <<'^'<<n;
 	if (n-1) cout << " + ";
+
+
 
 	for(int i=1;i<=(n-1);i++){
 		INT mul = eq<INT>(x,i,n);
@@ -57,7 +74,6 @@ template<typename INT> void display_and_compute(INT x, INT n){
 	return;
 
 }
-
 //verrify if equasion is working
 template<typename INT> INT verify(INT x,INT n){
 	
@@ -82,14 +98,37 @@ int main(int argc, const char* argv[]){
 	 */
 		
 	int n = atoi(argv[1]);	
+	
 
 	if (argc >= 3){
+
 		int m = atoi(argv[2]);
-		for(int i=0;i<m;i++){
-			display_and_compute<unsigned long long int>(1,n+i);
+
+		ull** t= new ull*[m+1];
+		for(int i=0;i<m+1;i++) t[i] = new ull[m +1];	
+		mem = &t[0];
+
+		for(int i=0;i<m+1;i++){
+			for(int j=0;j<m+1;j++) mem[i][j] = -1;
 		}
+
+		for(int i=0;i<m;i++){
+			display_and_compute<ull>(1,n+i);
+		}
+		delete[] t;
 		return 0;
 	}
-	cout << compute<unsigned long long int>(1,n) << '\n'; 
-	cout << verify<unsigned long long int>(1,n) << '\n'; 
+
+	ull** t= new ull*[n+1];
+	for(int i=0;i<n+1;i++) t[i] = new ull[n+1];	
+	mem = &t[0];
+
+	for(int i=0;i<n+1;i++){
+		for(int j=0;j<n+1;j++) mem[i][j] = -1;
+	}
+
+	cout << compute<ull>(1,n) << '\n'; 
+	cout << verify<ull>(1,n) << '\n'; 
+	
+	delete[] t;
 }
